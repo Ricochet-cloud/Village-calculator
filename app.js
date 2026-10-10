@@ -78,6 +78,24 @@ const formatNumber = v =>
     maximumFractionDigits: 0
   }).format(num(v));
 
+const moneyKeys = new Set([
+  'appraisal', 'market', 'acqTax', 'legalFee',
+  'interior', 'clean', 'evict', 'tax', 'other',
+  'bid', 'sale'
+]);
+
+function moneyInput(p, key, label = '') {
+  return `
+    <input
+      aria-label="${label}"
+      data-id="${p.id}"
+      data-key="${key}"
+      type="text"
+      inputmode="numeric"
+      value="${formatNumber(p[key] ?? 0)}"
+      placeholder="0">`;
+}
+
 // 평수 입력은 "24", "24평" 모두 허용
 function areaNumber(p) {
   const match = String(p.area ?? '').replace(/,/g, '').match(/[\d.]+/);
@@ -135,15 +153,19 @@ function esc(s) {
   }[c]));
 }
 
+
 function field(p, key, label, type = 'number', placeholder = '0') {
+  const isMoney = moneyKeys.has(key);
+
   return `
     <label>${label}
       <input
         data-id="${p.id}"
         data-key="${key}"
-        type="${type}"
-        value="${esc(p[key] ?? '')}"
-        ${type === 'number' ? 'min="0" step="any"' : ''}
+        type="${isMoney ? 'text' : type}"
+        ${isMoney ? 'inputmode="numeric"' : ''}
+        ${!isMoney && type === 'number' ? 'min="0" step="any"' : ''}
+        value="${isMoney ? formatNumber(p[key] ?? 0) : esc(p[key] ?? '')}"
         placeholder="${placeholder}">
     </label>`;
 }
@@ -180,13 +202,14 @@ function autoRow(p, key, label, note) {
     <tr class="${rowClass}">
       <td>${label}</td>
       <td>
-        <input
-          aria-label="${label}"
-          data-auto="${key}"
-          data-id="${p.id}"
-          type="number"
-          value="${esc(p[key] || 0)}"
-          readonly>
+       <input
+  aria-label="${label}"
+  data-auto="${key}"
+  data-id="${p.id}"
+  type="text"
+  inputmode="numeric"
+  value="${formatNumber(p[key] ?? 0)}"
+  readonly>
       </td>
       <td class="note">${note}</td>
     </tr>`;
@@ -280,8 +303,7 @@ function render() {
             <tr class="shade">
               <td>감정가</td>
               <td>
-                <input data-id="${p.id}" data-key="appraisal"
-                  type="number" min="0" value="${esc(p.appraisal || 0)}">
+              ${moneyInput(p, 'appraisal', '감정가')}
               </td>
               <td></td>
             </tr>
@@ -289,8 +311,7 @@ function render() {
             <tr class="shade">
               <td>실거래가 / 시세</td>
               <td>
-                <input data-id="${p.id}" data-key="market"
-                  type="number" min="0" value="${esc(p.market || 0)}">
+              ${moneyInput(p, 'market', '실거래가 / 시세')}
               </td>
               <td></td>
             </tr>
@@ -315,8 +336,7 @@ function render() {
             <tr class="pink">
               <td>입찰가</td>
               <td>
-                <input data-id="${p.id}" data-key="bid"
-                  type="number" min="0" value="${esc(p.bid || 0)}">
+              ${moneyInput(p, 'bid', '입찰가')}
               </td>
               <td></td>
             </tr>
@@ -330,8 +350,7 @@ function render() {
             <tr class="pink">
               <td>매도 예상가격</td>
               <td>
-                <input data-id="${p.id}" data-key="sale"
-                  type="number" min="0" value="${esc(p.sale || 0)}">
+              ${moneyInput(p, 'sale', '매도 예상가격')}
               </td>
               <td></td>
             </tr>
@@ -455,7 +474,7 @@ function refreshCard(id) {
   card.querySelectorAll('[data-auto]').forEach(el => {
     const key = el.dataset.auto;
     if (key === 'acqTax' || key === 'evict' || key === 'legalFee') {
-      el.value = String(num(p[key]));
+      el.value = formatNumber(p[key]);
     }
   });
 
@@ -633,3 +652,11 @@ function download(content, name, type) {
 }
 
 render();
+
+document.querySelector('#properties').addEventListener('focusout', e => {
+  const el = e.target;
+  if (!el.dataset.key || !moneyKeys.has(el.dataset.key)) return;
+
+  const p = properties.find(x => x.id === el.dataset.id);
+  if (p) el.value = formatNumber(p[el.dataset.key]);
+});
