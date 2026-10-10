@@ -158,9 +158,14 @@ function row(p, key, label, note = '') {
     </tr>`;
 }
 
+
 function autoRow(p, key, label, note) {
+  const rowClass = (key === 'acqTax' || key === 'evict')
+    ? ''
+    : 'shade';
+
   return `
-    <tr class="shade">
+    <tr class="${rowClass}">
       <td>${label}</td>
       <td>
         <input
