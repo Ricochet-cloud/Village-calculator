@@ -68,7 +68,17 @@ const won = n =>
     maximumFractionDigits: 0
   }).format(Number(n) || 0);
 
-const num = v => Math.max(0, Number(v) || 0);
+```js
+const num = v => Math.max(
+  0,
+  Number(String(v ?? '').replace(/,/g, '')) || 0
+);
+
+const formatNumber = v =>
+  new Intl.NumberFormat('ko-KR', {
+    maximumFractionDigits: 0
+  }).format(num(v));
+```
 
 // 평수 입력은 "24", "24평" 모두 허용
 function areaNumber(p) {
@@ -140,6 +150,7 @@ function field(p, key, label, type = 'number', placeholder = '0') {
     </label>`;
 }
 
+```js
 function row(p, key, label, note = '') {
   return `
     <tr>
@@ -149,10 +160,9 @@ function row(p, key, label, note = '') {
           aria-label="${label}"
           data-id="${p.id}"
           data-key="${key}"
-          type="number"
-          min="0"
-          step="any"
-          value="${esc(p[key] ?? 0)}">
+          type="text"
+          inputmode="numeric"
+          value="${formatNumber(p[key] ?? 0)}">
       </td>
       <td class="note">
         <input
@@ -163,6 +173,7 @@ function row(p, key, label, note = '') {
       </td>
     </tr>`;
 }
+```
 
 
 function autoRow(p, key, label, note) {
