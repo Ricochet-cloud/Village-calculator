@@ -391,45 +391,38 @@ function render() {
             </strong>
           </div>
 
-          <div class="result">
-            <small>필요 현금 (대출 70%)</small>
-            <strong data-out="cash">${won(cash(p, 70))}</strong>
-          </div>
         </div>
 
-        <div class="loan">
-          <div class="section-title">경락대출 및 필요현금</div>
+       <div class="loan">
+  <div class="section-title">경락대출 및 필요현금</div>
 
-          <div class="loan-grid">
-            ${field(p, 'rate70', '경락대출 비율 70% 계산')}
-            ${field(p, 'rate80', '경락대출 비율 80% 계산')}
+  <div class="loan-grid">
+    <div class="result">
+      <small>대출 70% 예상 대출금</small>
+      <strong data-out="loan70">${won(loan(p, 70))}</strong>
+    </div>
 
-          <div class="result">
-  <small>대출 70% 예상 대출금</small>
-  <strong data-out="loan70">${won(loan(p, 70))}</strong>
+    <div class="result">
+      <small>대출 70% 필요현금</small>
+      <strong data-out="cash70">${won(cash(p, 70))}</strong>
+    </div>
+
+    <div class="result">
+      <small>대출 80% 예상 대출금</small>
+      <strong data-out="loan80">${won(loan(p, 80))}</strong>
+    </div>
+
+    <div class="result">
+      <small>대출 80% 필요현금</small>
+      <strong data-out="cash80">${won(cash(p, 80))}</strong>
+    </div>
+  </div>
+
+  <div class="footer">
+    대출액은 입찰가 × 대출비율로 단순 추정합니다.
+    실제 대출한도는 금융기관 심사 등에 따라 달라질 수 있습니다.
+  </div>
 </div>
-
-<div class="result">
-  <small>대출 70% 가정 필요현금</small>
-  <strong data-out="cash70">${won(cash(p, 70))}</strong>
-</div>
-
-<div class="result">
-  <small>대출 80% 예상 대출금</small>
-  <strong data-out="loan80">${won(loan(p, 80))}</strong>
-</div>
-
-<div class="result">
-  <small>대출 80% 가정 필요현금</small>
-  <strong data-out="cash80">${won(cash(p, 80))}</strong>
-</div>
-          </div>
-
-          <div class="footer">
-            대출액은 입찰가 × 대출비율로 단순 추정합니다.
-            실제 대출한도는 금융기관 심사 등에 따라 달라질 수 있습니다.
-          </div>
-        </div>
 
         <div class="notes">
           <label>메모</label>
@@ -485,8 +478,8 @@ function refreshCard(id) {
     total: won(total(p)),
     profit: won(profit(p)),
     cash: won(cash(p, 70)),
-    cash70: won(cash(p, num(p.rate70))),
-    cash80: won(cash(p, num(p.rate80))),
+    cash70: won(cash(p, 70)),
+    cash80: won(cash(p, 80)),
     bidRatio: p.appraisal > 0
       ? (num(p.bid) / num(p.appraisal) * 100).toFixed(1) + '%'
       : '—',
