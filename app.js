@@ -102,9 +102,15 @@ function profit(p) {
   return num(p.sale) - total(p);
 }
 
-function cash(p, rate = 70) {
-  return Math.max(0, total(p) - num(p.bid) * rate / 100);
+
+function loan(p, rate = 70) {
+  return Math.round(num(p.bid) * rate / 100);
 }
+
+function cash(p, rate = 70) {
+  return Math.max(0, num(p.bid) - loan(p, rate));
+}
+
 
 function save() {
   localStorage.setItem(KEY, JSON.stringify(properties));
@@ -373,15 +379,25 @@ function render() {
             ${field(p, 'rate70', '경락대출 비율 70% 계산')}
             ${field(p, 'rate80', '경락대출 비율 80% 계산')}
 
-            <div class="result">
-              <small>대출 70% 가정 필요현금</small>
-              <strong data-out="cash70">${won(cash(p, 70))}</strong>
-            </div>
+          <div class="result">
+  <small>대출 70% 예상 대출금</small>
+  <strong data-out="loan70">${won(loan(p, 70))}</strong>
+</div>
 
-            <div class="result">
-              <small>대출 80% 가정 필요현금</small>
-              <strong data-out="cash80">${won(cash(p, 80))}</strong>
-            </div>
+<div class="result">
+  <small>대출 70% 가정 필요현금</small>
+  <strong data-out="cash70">${won(cash(p, 70))}</strong>
+</div>
+
+<div class="result">
+  <small>대출 80% 예상 대출금</small>
+  <strong data-out="loan80">${won(loan(p, 80))}</strong>
+</div>
+
+<div class="result">
+  <small>대출 80% 가정 필요현금</small>
+  <strong data-out="cash80">${won(cash(p, 80))}</strong>
+</div>
           </div>
 
           <div class="footer">
@@ -438,6 +454,8 @@ function refreshCard(id) {
   });
 
   const values = {
+    loan70: won(loan(p, 70)),
+    loan80: won(loan(p, 80)),
     cost: won(sum(p)),
     total: won(total(p)),
     profit: won(profit(p)),
