@@ -41,6 +41,7 @@ try {
   properties = [];
 }
 
+
 if (!properties.length) properties = [defaults()];
 
 // 기존 저장 데이터와 새 계산 항목 호환
@@ -53,15 +54,12 @@ properties.forEach(p => {
 
   if (!p.notes) p.notes = {};
 
-  // 새 비용 항목이 없는 기존 매물에 새 기준 적용
   if (p.acqTax === undefined) p.acqTax = 0;
   if (p.legalFee === undefined) p.legalFee = 500000;
-
-  // 평수와 입찰가를 기준으로 자동 계산
-  recalculate(p);
 });
 
 activeId = properties[0]?.id || null;
+
 
 const won = n =>
   new Intl.NumberFormat('ko-KR', {
